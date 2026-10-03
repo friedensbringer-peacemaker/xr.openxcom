@@ -351,6 +351,15 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
            return;
         }
 
+        // Multi-window systems (Android 7+, like newer SDL releases) and above all the Meta Quest:
+        // in immersive mode Horizon OS hands the window focus to the system shell while the app
+        // keeps running. Pausing here froze the game thread for good (no frame ever reached the
+        // OpenXR canvas), and without focus a later onResume would never resume either.
+        // onPause()/surfaceDestroyed() still pause the game; in VR the XR session decides the rest.
+        if (!hasFocus && Build.VERSION.SDK_INT >= 24) {
+           return;
+        }
+
         SDLActivity.mHasFocus = hasFocus;
         if (hasFocus) {
            mNextNativeState = NativeState.RESUMED;

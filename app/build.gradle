@@ -22,7 +22,7 @@ ext.revision = getRevision()
 android {
     namespace "org.openxcom.extended"
     compileSdk 35
-    ndkVersion "30.0.14904198"
+    ndkVersion "30.0.16248370"
 
     externalNativeBuild {
         cmake {
@@ -31,16 +31,16 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.libsdl.openxcom"
+        applicationId "xr.openxcom"
         minSdk 21
         targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        versionCode 5
+        versionName "8.7.1-xr.5"
 
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=c++_static", "-DANDROID_ARM_MODE=arm", "-DOPENXCOM_VERSION_STRING=${project.revision}"
-                abiFilters "armeabi-v7a", "x86", "x86_64", "arm64-v8a"
+                arguments "-DANDROID_STL=c++_static", "-DANDROID_ARM_MODE=arm", "-DOPENXCOM_VERSION_STRING=${defaultConfig.versionName}"
+                abiFilters "arm64-v8a"
                 cppFlags "-std=c++17", "-fexceptions", "-frtti"
             }
         }

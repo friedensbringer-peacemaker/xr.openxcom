@@ -82,3 +82,9 @@ I (Meridian) have only copied and customized his work on this build system.
 Many thanks also to Stoddard for helping with all aspects of the project (2019).
 
 Many thanks also to robmat for modernising the build system (2026).
+
+# License
+
+OXCE for Android and OXCE are licensed under the GNU General Public License v3.0 (see `COPYING`).
+The bundled Khronos OpenXR loader (`app/src/main/jniLibs/arm64-v8a/libopenxr_loader.so`) and headers
+are licensed under Apache-2.0 (see `app/src/main/jni/openxr/LICENSE` and `README.txt` there).

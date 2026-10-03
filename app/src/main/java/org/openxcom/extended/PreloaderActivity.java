@@ -42,6 +42,7 @@ public class PreloaderActivity extends Activity {
 
     private static final int REQUEST_WRITE_STORAGE = 112;
     private boolean hasWritePermission = false;
+    private boolean unpackStarted = false, permissionDialogShown = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,11 @@ public class PreloaderActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        // Returning from the "All files access" screen, onStart comes before onActivityResult:
+        // ask the system again instead of trusting the value from onCreate (no second dialog).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            hasWritePermission = Environment.isExternalStorageManager();
+        }
         if (!hasWritePermission) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 requestAllFilesAccess();
@@ -90,11 +96,16 @@ public class PreloaderActivity extends Activity {
 
     @TargetApi(30)
     private void requestAllFilesAccess() {
+        if (permissionDialogShown) {
+            return; // onStart and onActivityResult both ask - show one dialog only
+        }
+        permissionDialogShown = true;
         new AlertDialog.Builder(this)
                 .setTitle("Permission required")
                 .setMessage("This game stores its data on external storage. " +
                         "Please grant 'All files access' on the next screen.")
                 .setPositiveButton("Open Settings", (d, i) -> {
+                    permissionDialogShown = false;
                     Intent intent = new Intent(
                             Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
                             Uri.parse("package:" + getPackageName()));
@@ -153,6 +164,10 @@ public class PreloaderActivity extends Activity {
     }
 
     private void unpackData() {
+        if (unpackStarted) {
+            return; // onStart and onActivityResult can both arrive here - unpack and launch once
+        }
+        unpackStarted = true;
         new AsyncTask<Void, String, Void>()
         {
             Set<String> assetContents;
@@ -300,6 +315,9 @@ public class PreloaderActivity extends Activity {
                 intent = new Intent(this, DirsConfigActivity.class);
             }
 			startActivity(intent);
+			// Replaces android:noHistory: that flag also killed the preloader while the
+			// "All files access" settings screen was open, so nothing came back after granting it.
+			finish();
 		}
 	}
 
@@ -320,6 +338,7 @@ public class PreloaderActivity extends Activity {
         } catch (IOException e) {
             Log.w(TAG, "Could not open 2_UFO.zip; did you package your files correctly?");
         }
-        return new File(config.getDataFolderPath() + "/UFO/TERRAIN/UFO1.PCK").exists();
+        return new File(config.getDataFolderPath() + "/UFO/TERRAIN/UFO1.PCK").exists()
+                || new File(config.getDataFolderPath() + "/TFTD/GEODATA/PALETTES.DAT").exists();
 	}
 }

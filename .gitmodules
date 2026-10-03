@@ -12,4 +12,4 @@
 	url = https://github.com/MeridianOXC/SDL_gfx_SDL2
 [submodule "app/src/main/jni/OpenXcom"]
 	path = app/src/main/jni/OpenXcom
-	url = https://github.com/MeridianOXC/OpenXcom
+	url = https://github.com/friedensbringer-peacemaker/xr.openxcom-engine.git

@@ -44,6 +44,13 @@ file(GLOB OPENXCOM_FILES_ENGINE
     OpenXcom/src/Engine/Scalers/*.cpp
     )
 
+# Immersive Quest mode (OpenXR)
+file(GLOB OPENXCOM_FILES_XR
+    OpenXcom/src/Engine/Xr/*.cpp)
+set_source_files_properties(${OPENXCOM_FILES_XR}
+    OpenXcom/src/Menu/VrMenuState.cpp OpenXcom/src/Menu/VrOptionsState.cpp OpenXcom/src/Menu/VrMenuFocus.cpp PROPERTIES
+    COMPILE_OPTIONS "-Wall;-Wextra;-Wno-missing-field-initializers")
+
 file(GLOB OPENXCOM_FILES_GEOSCAPE
     OpenXcom/src/Geoscape/*.cpp)
 
@@ -72,6 +79,7 @@ set(OPENXCOM_SOURCES
     ${OPENXCOM_FILES_BASESCAPE}
     ${OPENXCOM_FILES_BATTLESCAPE}
     ${OPENXCOM_FILES_ENGINE}
+    ${OPENXCOM_FILES_XR}
     ${OPENXCOM_FILES_GEOSCAPE}
     ${OPENXCOM_FILES_INTERFACE}
     ${OPENXCOM_FILES_MENU}
@@ -91,6 +99,13 @@ set_source_files_properties(OpenXcom/libs/miniz/miniz.c PROPERTIES COMPILE_FLAGS
 find_library(EGL_LIB EGL)
 find_library(LOG_LIB log)
 find_library(GLESv2_LIB GLESv2)
+find_library(GLESv3_LIB GLESv3)
+
+# Khronos OpenXR loader 1.1.58 (Apache-2.0), prebuilt for arm64-v8a
+add_library(openxr_loader SHARED IMPORTED)
+set_target_properties(openxr_loader PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI}/libopenxr_loader.so")
+target_include_directories(openxcom PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/openxr/include")
 find_library(OpenSLES_LIB OpenSLES)
 find_library(ZLIB z)
 find_library(DLLIB dl)
@@ -106,6 +121,8 @@ target_link_libraries(openxcom
     ${EGL_LIB}
     ${LOG_LIB}
     ${GLESv2_LIB}
+    ${GLESv3_LIB}
+    openxr_loader
     ${OpenSLES_LIB}
     ${ZLIB}
     cpufeatures
